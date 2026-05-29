@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EKS - Interactive Electrical Simulators</title>
+    <title>EKS - Advanced Electrical Simulators</title>
     <style>
         :root {
             --primary: #2c3e50; --secondary: #e67e22; --bg: #ecf0f1; --text: #333;
@@ -34,23 +34,42 @@
         button:hover { background-color: #d35400; }
         
         .sim-area { background: #34495e; border-radius: 8px; padding: 20px; text-align: center; margin-top: 20px; position: relative; min-height: 180px; display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; }
+        .meter-screen { background: #a2ccb6; padding: 15px; border: 4px solid #333; border-radius: 5px; font-family: monospace; font-size: 24px; font-weight: bold; width: 180px; text-align: right; box-shadow: inset 0 0 10px rgba(0,0,0,0.2);}
 
-        /* --- Custom Visuals --- */
-        /* VFD */
+        /* 1. VFD */
         .vfd-fan { width: 80px; height: 80px; border: 4px solid #95a5a6; border-radius: 50%; position: relative; background: #2c3e50; }
         .blade { position: absolute; width: 8px; height: 70px; background: #ecf0f1; top: 5px; left: 36px; border-radius: 4px; }
         .blade:nth-child(2) { transform: rotate(60deg); } .blade:nth-child(3) { transform: rotate(120deg); }
-        .vfd-screen { background: black; color: #2ecc71; font-family: monospace; font-size: 20px; padding: 10px; border-radius: 5px; border: 2px solid #7f8c8d; }
-        /* Lighting */
+        
+        /* 2. MCB Breaker */
+        .mcb-body { width: 80px; height: 120px; background: #ecf0f1; border: 2px solid #bdc3c7; border-radius: 8px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 2px 2px 5px rgba(0,0,0,0.3);}
+        .mcb-switch { width: 40px; height: 50px; background: var(--success); border-radius: 4px; transition: 0.3s; transform-origin: bottom; margin-top: -20px; box-shadow: inset 0 -4px 0 rgba(0,0,0,0.2);}
+        .mcb-switch.tripped { background: var(--danger); transform: scaleY(-1); box-shadow: inset 0 4px 0 rgba(0,0,0,0.2);}
+        .mcb-label { margin-top: 15px; font-weight: bold; color: #333; font-size: 18px;}
+        .heat-bar-container { width: 10px; height: 100px; background: #222; border-radius: 5px; overflow: hidden; position: relative;}
+        .heat-bar { width: 100%; height: 0%; background: #e74c3c; position: absolute; bottom: 0; transition: height 0.1s linear;}
+
+        /* 3. Star/Delta Visuals */
+        .motor-block { position: relative; width: 260px; height: 160px; background: #2c3e50; border-radius: 10px; border: 4px solid #7f8c8d; margin: 0 auto;}
+        .dot { width: 24px; height: 24px; background: #f1c40f; border-radius: 50%; position: absolute; border: 2px solid #d35400; z-index: 2; box-shadow: inset 0 0 5px rgba(0,0,0,0.5);}
+        .l-txt { color: white; position: absolute; font-size: 14px; font-weight: bold; font-family: monospace;}
+        .d-u1 { top: 30px; left: 40px; } .t-u1 { top: 10px; left: 45px; } .d-v1 { top: 30px; left: 115px; } .t-v1 { top: 10px; left: 120px; } .d-w1 { top: 30px; left: 190px; } .t-w1 { top: 10px; left: 195px; }
+        .d-w2 { top: 100px; left: 40px; } .t-w2 { top: 130px; left: 45px; } .d-u2 { top: 100px; left: 115px; } .t-u2 { top: 130px; left: 120px; } .d-v2 { top: 100px; left: 190px; } .t-v2 { top: 130px; left: 195px; }
+        .copper-link { position: absolute; background: #e67e22; z-index: 1; border-radius: 4px; box-shadow: 2px 2px 4px rgba(0,0,0,0.4); display: none; transition: 0.3s;}
+        .link-star { top: 106px; left: 40px; width: 174px; height: 12px; }
+        .link-d1 { top: 40px; left: 46px; width: 12px; height: 74px; } .link-d2 { top: 40px; left: 121px; width: 12px; height: 74px; } .link-d3 { top: 40px; left: 196px; width: 12px; height: 74px; }
+
+        /* 4. Polarity Socket */
+        .socket { width: 100px; height: 100px; background: #ecf0f1; border-radius: 10px; position: relative; border: 2px solid #bdc3c7;}
+        .pin { width: 15px; height: 25px; background: #2c3e50; position: absolute; border-radius: 2px;}
+        .pin-e { top: 15px; left: 42px; width: 16px; height: 20px;}
+        .pin-n { bottom: 20px; left: 15px; }
+        .pin-l { bottom: 20px; right: 15px; }
+        .probe-dot { width: 12px; height: 12px; border-radius: 50%; position: absolute; z-index: 3; display: none; border: 2px solid white;}
+
+        /* Others */
         .room { width: 200px; height: 150px; border: 4px solid #7f8c8d; background: #222; position: relative; display: flex; justify-content: center; align-items: center; color: white; font-weight: bold; transition: 0.5s; }
-        .light-bulb { position: absolute; top: -15px; font-size: 30px; color: #f1c40f; text-shadow: 0 0 10px #f1c40f; }
-        /* Megger */
-        .meter-screen { background: #a2ccb6; padding: 15px; border: 4px solid #333; border-radius: 5px; font-family: monospace; font-size: 22px; width: 180px; text-align: right; font-weight: bold; }
-        /* Earth */
-        .earth-ground { width: 100%; height: 60px; background: #8e44ad; position: absolute; bottom: 0; border-radius: 0 0 8px 8px; }
-        .spike { width: 6px; height: 50px; background: #f1c40f; position: absolute; bottom: 30px; }
-        /* Continuity */
-        .wire-break { width: 200px; height: 10px; background: linear-gradient(90deg, #e74c3c 45%, transparent 45%, transparent 55%, #e74c3c 55%); margin: 20px auto; position: relative; }
+        .wire-break { width: 200px; height: 10px; background: linear-gradient(90deg, #e74c3c 45%, transparent 45%, transparent 55%, #e74c3c 55%); margin: 20px auto; }
         .wire-fixed { background: #e74c3c; }
         .buzzer { width: 50px; height: 50px; background: #333; border-radius: 50%; border: 4px solid #555; line-height: 50px; color: #333; font-weight: bold; transition: 0.2s;}
         .buzzer.beep { background: #f1c40f; color: black; box-shadow: 0 0 20px #f1c40f; transform: scale(1.1); }
@@ -65,40 +84,111 @@
 
     <div class="container">
         <div class="nav-tabs">
-            <div class="nav-btn active" onclick="openTab('t-vfd')">VFD Control</div>
-            <div class="nav-btn" onclick="openTab('t-trip')">Breaker Trip</div>
+            <div class="nav-btn active" onclick="openTab('t-trip')">MCB Breaker</div>
+            <div class="nav-btn" onclick="openTab('t-star')">Star/Delta Visual</div>
+            <div class="nav-btn" onclick="openTab('t-polar')">Polarity Test</div>
+            <div class="nav-btn" onclick="openTab('t-vfd')">VFD Control</div>
             <div class="nav-btn" onclick="openTab('t-pf')">Power Factor</div>
-            <div class="nav-btn" onclick="openTab('t-star')">Star/Delta</div>
             <div class="nav-btn" onclick="openTab('t-light')">Lighting (Lux)</div>
             <div class="nav-btn" onclick="openTab('t-megger')">Megger Test</div>
-            <div class="nav-btn" onclick="openTab('t-earth')">Earth Resistance</div>
-            <div class="nav-btn" onclick="openTab('t-cont')">Continuity Test</div>
+            <div class="nav-btn" onclick="openTab('t-cont')">Continuity</div>
         </div>
 
-        <div id="t-vfd" class="tab-content active">
+        <div id="t-trip" class="tab-content active">
+            <h2>MCB Sizing & Tripping Simulator</h2>
+            <p style="font-size:14px; color:#555;">Breaker ခံနိုင်ရည်ထက် ကားရန့်အနည်းငယ်ပိုပါက (Thermal Trip) အချိန်ယူပြီးမှကျမည်ဖြစ်ပြီး၊ အလွန်များပါက (Magnetic Trip) ချက်ချင်းကျပါမည်။</p>
+            <div class="slider-group">
+                <label>MCB Breaker အရွယ်အစား (Rating)</label>
+                <select id="mcb-size" onchange="resetMCB()">
+                    <option value="16">16 A (C-Curve)</option>
+                    <option value="32">32 A (C-Curve)</option>
+                    <option value="63">63 A (C-Curve)</option>
+                </select>
+            </div>
+            <div class="slider-group">
+                <label><span>မော်တာမှ ဆွဲယူမည့် Load Current</span> <span id="mcb-amp">0 A</span></label>
+                <input type="range" id="mcb-sl" min="0" max="200" value="0" oninput="runMCB()">
+            </div>
+            
+            <div class="sim-area">
+                <div class="heat-bar-container" title="Bimetallic Strip Heat Level"><div class="heat-bar" id="mcb-heat"></div></div>
+                <div class="mcb-body">
+                    <div class="mcb-switch" id="mcb-sw"></div>
+                    <div class="mcb-label" id="mcb-lbl">16A</div>
+                </div>
+            </div>
+            <div id="mcb-msg" style="text-align:center; font-weight:bold; margin-top:10px;">STANDBY</div>
+            <button id="mcb-btn" style="display:none; margin-top:15px;" onclick="resetMCB()">Reset Breaker</button>
+        </div>
+
+        <div id="t-star" class="tab-content">
+            <h2>Motor Terminal (Star / Delta)</h2>
+            <p style="font-size:14px; color:#555;">မော်တာ Nameplate ပေါ်မူတည်၍ 400V စနစ်တွင် ကြေးပြားဆက်သွယ်ရမည့် ပုံစံများ။</p>
+            <select id="std-sel" onchange="runStar()">
+                <option value="star">Motor: 230V Delta / 400V Star</option>
+                <option value="delta">Motor: 400V Delta / 690V Star</option>
+            </select>
+            
+            <div class="sim-area">
+                <div class="motor-block">
+                    <div class="l-txt t-u1">U1</div><div class="l-txt t-v1">V1</div><div class="l-txt t-w1">W1</div>
+                    <div class="l-txt t-w2">W2</div><div class="l-txt t-u2">U2</div><div class="l-txt t-v2">V2</div>
+                    <div class="dot d-u1"></div><div class="dot d-v1"></div><div class="dot d-w1"></div>
+                    <div class="dot d-w2"></div><div class="dot d-u2"></div><div class="dot d-v2"></div>
+                    <div class="copper-link link-star" id="lk-s"></div>
+                    <div class="copper-link link-d1" id="lk-d1"></div>
+                    <div class="copper-link link-d2" id="lk-d2"></div>
+                    <div class="copper-link link-d3" id="lk-d3"></div>
+                </div>
+            </div>
+            <div id="std-msg" style="text-align:center; font-weight:bold; margin-top:15px; font-size:18px;">STAR (Y) CONNECTION</div>
+        </div>
+
+        <div id="t-polar" class="tab-content">
+            <h2>Socket Polarity Test (L & N မှားခြင်း)</h2>
+            <p style="font-size:14px; color:#555;">အိမ်တွင်းပလပ်ပေါက်များတွင် Line နှင့် Neutral ကြိုးမှားဆက်ထားခြင်း ရှိ/မရှိ Multimeter ဖြင့် စစ်ဆေးပါ။</p>
+            
+            <select id="pol-cond" onchange="runPolarity()" style="border: 2px solid var(--primary); font-weight:bold;">
+                <option value="normal">✅ မှန်ကန်သော ဝါယာကြိုးဆက်သွယ်မှု (Normal Wiring)</option>
+                <option value="reversed">❌ L နှင့် N ပြောင်းပြန်ဖြစ်နေမှု (Reversed Polarity)</option>
+            </select>
+            
+            <div style="display:flex; gap:10px; margin-top:10px;">
+                <select id="pol-red" onchange="runPolarity()" style="color:red; font-weight:bold;">
+                    <option value="R">Red Probe 🔴 : ညာဘက်အပေါက်</option>
+                    <option value="L">Red Probe 🔴 : ဘယ်ဘက်အပေါက်</option>
+                    <option value="T">Red Probe 🔴 : အပေါ်အပေါက် (Earth)</option>
+                </select>
+                <select id="pol-blk" onchange="runPolarity()" style="color:black; font-weight:bold;">
+                    <option value="T">Black Probe ⚫ : အပေါ်အပေါက် (Earth)</option>
+                    <option value="L">Black Probe ⚫ : ဘယ်ဘက်အပေါက်</option>
+                    <option value="R">Black Probe ⚫ : ညာဘက်အပေါက်</option>
+                </select>
+            </div>
+
+            <div class="sim-area" style="position:relative;">
+                <div class="meter-screen" id="pol-sc">0 V</div>
+                <div class="socket">
+                    <div class="pin pin-e"></div>
+                    <div class="pin pin-n"></div>
+                    <div class="pin pin-l"></div>
+                    <div class="probe-dot" id="dot-r" style="background:red;"></div>
+                    <div class="probe-dot" id="dot-b" style="background:black;"></div>
+                </div>
+            </div>
+            <div id="pol-msg" style="text-align:center; font-weight:bold; margin-top:10px; color:var(--primary); line-height:1.5;"></div>
+        </div>
+
+        <div id="t-vfd" class="tab-content">
             <h2>VFD Motor Control</h2>
             <div class="slider-group">
                 <label><span>Frequency (Hz)</span> <span id="vfd-hz">50 Hz</span></label>
                 <input type="range" id="vfd-sl" min="0" max="60" value="50" oninput="runVFD()">
             </div>
             <div class="sim-area">
-                <div class="vfd-screen" id="vfd-sc">50.0 Hz<br>1500 RPM</div>
-                <div class="vfd-fan" id="vfd-f">
-                    <div class="blade"></div><div class="blade"></div><div class="blade"></div>
-                </div>
+                <div class="meter-screen" id="vfd-sc" style="color:#2ecc71; background:black; border-color:#7f8c8d;">50.0 Hz<br>1500 RPM</div>
+                <div class="vfd-fan" id="vfd-f"><div class="blade"></div><div class="blade"></div><div class="blade"></div></div>
             </div>
-        </div>
-
-        <div id="t-trip" class="tab-content">
-            <h2>Overload Breaker Trip</h2>
-            <div class="slider-group">
-                <label><span>Load Current (Max 50A)</span> <span id="trp-amp">10 A</span></label>
-                <input type="range" id="trp-sl" min="0" max="100" value="10" oninput="runTrip()">
-            </div>
-            <div class="sim-area" id="trp-area">
-                <div style="color:white; font-size:20px; font-weight:bold;" id="trp-msg">NORMAL</div>
-            </div>
-            <button id="trp-btn" style="display:none;" onclick="resetTrip()">Reset Breaker</button>
         </div>
 
         <div id="t-pf" class="tab-content">
@@ -119,17 +209,6 @@
             </div>
         </div>
 
-        <div id="t-star" class="tab-content">
-            <h2>Motor Terminal (Star/Delta)</h2>
-            <select id="std-sel" onchange="runStar()">
-                <option value="star">Motor 230V Delta / 400V Star</option>
-                <option value="delta">Motor 400V Delta / 690V Star</option>
-            </select>
-            <div class="sim-area">
-                <div style="color:white; font-size:18px; font-weight:bold;" id="std-msg">STAR (Y) CONNECTION</div>
-            </div>
-        </div>
-
         <div id="t-light" class="tab-content">
             <h2>Lighting Simulation (Lux Level)</h2>
             <div class="slider-group">
@@ -141,62 +220,29 @@
                 <input type="range" id="lt-w-sl" min="10" max="500" value="30" step="10" oninput="runLight()">
             </div>
             <div class="sim-area">
-                <div class="room" id="lt-room">
-                    <div class="light-bulb">💡</div>
-                    <span id="lt-lux" style="z-index:2; font-size:24px; text-shadow: 0 0 5px black;">0 Lux</span>
-                </div>
+                <div class="room" id="lt-room"><span id="lt-lux" style="z-index:2; font-size:24px;">0 Lux</span></div>
             </div>
-            <div id="lt-msg" style="text-align:center; font-weight:bold; margin-top:10px; color:var(--primary);"></div>
+            <div id="lt-msg" style="text-align:center; font-weight:bold; margin-top:10px;"></div>
         </div>
 
         <div id="t-megger" class="tab-content">
             <h2>Megger Test (Insulation Resistance)</h2>
-            <p style="font-size:14px; color:#555;">မော်တာ Phase (L1, L2, L3) နှင့် Body (Earth) ကြား ရှော့ရှိမရှိ စစ်ဆေးပါ။</p>
-            <div style="display:flex; gap:10px;">
-                <select id="mg-p1">
-                    <option value="L1">Red Probe: L1</option>
-                    <option value="L2">Red Probe: L2</option>
-                </select>
-                <select id="mg-p2">
-                    <option value="Earth">Black Probe: Body (Earth)</option>
-                    <option value="L1">Black Probe: L1</option>
-                </select>
-            </div>
-            <div style="margin-top:10px;">
-                <input type="checkbox" id="mg-fault"> <label for="mg-fault" style="color:red; font-weight:bold;">Fault အတု ဖန်တီးမည် (L1 ကို Body နှင့် ရှော့ဖြစ်စေရန်)</label>
-            </div>
-            <button onclick="runMegger()" style="margin-top:15px; padding:15px; font-size:18px; background-color:#c0392b;">PRESS TO TEST (500V)</button>
-            <div class="sim-area">
-                <div class="meter-screen" id="mg-screen">--- MΩ</div>
-            </div>
+            <select id="mg-p1"><option value="L1">Red Probe: L1</option></select>
+            <select id="mg-p2"><option value="Earth">Black Probe: Body (Earth)</option><option value="L1">Black Probe: L1</option></select>
+            <input type="checkbox" id="mg-fault" style="margin-top:10px;"> <label for="mg-fault" style="color:red; font-weight:bold;">Fault အတု ဖန်တီးမည်</label>
+            <button onclick="runMegger()" style="margin-top:15px; background-color:#c0392b;">PRESS TO TEST (500V)</button>
+            <div class="sim-area"><div class="meter-screen" id="mg-screen">--- MΩ</div></div>
             <div id="mg-msg" style="text-align:center; font-weight:bold; margin-top:10px;"></div>
-        </div>
-
-        <div id="t-earth" class="tab-content">
-            <h2>Earth Resistance Test (3-Pole)</h2>
-            <p style="font-size:14px; color:#555;">Current Spike (C) နှင့် Potential Spike (P) အကွာအဝေးကို ရွှေ့၍ မြေကြီးခုခံမှု တိုင်းတာပါ။</p>
-            <div class="slider-group">
-                <label><span>Spikes အကွာအဝေး (Distance)</span> <span id="er-dist">5 Meters</span></label>
-                <input type="range" id="er-sl" min="5" max="30" value="5" oninput="runEarth()">
-            </div>
-            <div class="sim-area" style="position:relative;">
-                <div class="meter-screen" id="er-screen" style="position:absolute; top:20px;">--- Ω</div>
-                <div class="earth-ground"></div>
-                <div class="spike" style="left: 20%; background: #2ecc71;"></div> <div class="spike" id="er-p" style="left: 50%; background: #e74c3c;"></div> <div class="spike" id="er-c" style="left: 80%; background: #f1c40f;"></div> </div>
-            <div id="er-msg" style="text-align:center; font-weight:bold; margin-top:10px;"></div>
         </div>
 
         <div id="t-cont" class="tab-content">
             <h2>Continuity Test (Buzzer)</h2>
-            <p style="font-size:14px; color:#555;">ကြိုးပြတ်နေခြင်း ရှိ/မရှိ Multimeter Buzzer ဖြင့် တိုင်းတာစစ်ဆေးပါ။</p>
-            
             <div class="sim-area">
                 <div class="wire-break" id="ct-wire"></div>
                 <div class="buzzer" id="ct-buzzer">BEEP</div>
             </div>
-            
             <button onclick="fixWire()" id="ct-fix-btn" style="background-color:#f39c12; margin-bottom:10px;">ကြိုးကို ပြန်ဆက်မည်</button>
-            <button onclick="runCont()" style="background-color:#2980b9; padding:15px; font-size:18px;">တိုင်းတာမည် (Test)</button>
+            <button onclick="runCont()" style="background-color:#2980b9;">တိုင်းတာမည် (Test)</button>
             <div id="ct-msg" style="text-align:center; font-weight:bold; margin-top:10px;"></div>
         </div>
 
@@ -209,9 +255,129 @@
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
             event.target.classList.add('active');
+            if(tabId === 't-trip') resetMCB();
+            if(tabId === 't-star') runStar();
+            if(tabId === 't-polar') runPolarity();
         }
 
-        // 1. VFD
+        // --- 1. MCB Breaker Logic ---
+        let heatTimer; let isTripped = false; let heatVal = 0;
+        function runMCB() {
+            if(isTripped) return;
+            let size = parseInt(document.getElementById('mcb-size').value);
+            let load = parseInt(document.getElementById('mcb-sl').value);
+            document.getElementById('mcb-amp').innerText = load + " A";
+            document.getElementById('mcb-lbl').innerText = size + "A";
+            let msg = document.getElementById('mcb-msg');
+            let hBar = document.getElementById('mcb-heat');
+            
+            clearInterval(heatTimer);
+
+            if(load <= size) {
+                heatVal = 0; hBar.style.height = "0%";
+                msg.innerText = "✅ Normal Operation (ပုံမှန်လည်ပတ်နေပါသည်)";
+                msg.style.color = "green";
+            } else if(load > size && load <= size * 3) {
+                msg.innerText = "⚠️ Thermal Overload (ဝါယာကြိုး ပူလာနေပါသည်)";
+                msg.style.color = "#d35400";
+                // Simulate bimetallic strip heating up
+                heatTimer = setInterval(() => {
+                    heatVal += (load/size) * 2; // Heats faster if load is higher
+                    hBar.style.height = Math.min(heatVal, 100) + "%";
+                    if(heatVal >= 100) triggerTrip("THERMAL TRIP (Overload ကျသွားပါသည်)");
+                }, 100);
+            } else if (load > size * 3) {
+                heatVal = 100; hBar.style.height = "100%";
+                triggerTrip("❌ MAGNETIC TRIP (Short Circuit ကြောင့် ချက်ချင်းကျပါသည်)");
+            }
+        }
+        function triggerTrip(reason) {
+            isTripped = true;
+            clearInterval(heatTimer);
+            document.getElementById('mcb-sw').classList.add('tripped');
+            let msg = document.getElementById('mcb-msg');
+            msg.innerText = reason;
+            msg.style.color = "red";
+            document.getElementById('mcb-sl').disabled = true;
+            document.getElementById('mcb-btn').style.display = "block";
+        }
+        function resetMCB() {
+            isTripped = false; heatVal = 0;
+            clearInterval(heatTimer);
+            document.getElementById('mcb-sw').classList.remove('tripped');
+            document.getElementById('mcb-heat').style.height = "0%";
+            document.getElementById('mcb-sl').value = 0;
+            document.getElementById('mcb-sl').disabled = false;
+            document.getElementById('mcb-btn').style.display = "none";
+            runMCB();
+        }
+
+        // --- 2. Star/Delta Visual Logic ---
+        function runStar() {
+            let val = document.getElementById('std-sel').value;
+            let msg = document.getElementById('std-msg');
+            let ls = document.getElementById('lk-s');
+            let ld1 = document.getElementById('lk-d1');
+            let ld2 = document.getElementById('lk-d2');
+            let ld3 = document.getElementById('lk-d3');
+
+            if(val === 'star') { 
+                msg.innerText = "STAR (Y) CONNECTION"; msg.style.color = "#f1c40f"; 
+                ls.style.display = "block"; ld1.style.display="none"; ld2.style.display="none"; ld3.style.display="none";
+            } else { 
+                msg.innerText = "DELTA (Δ) CONNECTION"; msg.style.color = "#e67e22"; 
+                ls.style.display = "none"; ld1.style.display="block"; ld2.style.display="block"; ld3.style.display="block";
+            }
+        }
+
+        // --- 3. Polarity Test Logic ---
+        function runPolarity() {
+            let cond = document.getElementById('pol-cond').value;
+            let rP = document.getElementById('pol-red').value;
+            let bP = document.getElementById('pol-blk').value;
+            
+            // Positioning Probes
+            let getPos = (pin) => {
+                if(pin==='T') return {top:'17px', left:'44px'}; // Earth
+                if(pin==='L') return {bottom:'22px', left:'17px'}; // Neutral (physically)
+                if(pin==='R') return {bottom:'22px', right:'17px'}; // Line (physically)
+            }
+            let dR = document.getElementById('dot-r');
+            let dB = document.getElementById('dot-b');
+            dR.style.display = 'block'; dB.style.display = 'block';
+            Object.assign(dR.style, {top:'', bottom:'', left:'', right:''}, getPos(rP));
+            Object.assign(dB.style, {top:'', bottom:'', left:'', right:''}, getPos(bP));
+
+            // Logic Simulation
+            let vL = cond === 'normal' ? 230 : 0;   // If reversed, Right pin becomes N(0V)
+            let vN = cond === 'normal' ? 0 : 230;   // If reversed, Left pin becomes L(230V)
+            let vE = 0; // Earth is always 0
+
+            let getVolt = (pin) => {
+                if(pin==='R') return vL;
+                if(pin==='L') return vN;
+                if(pin==='T') return vE;
+            }
+
+            let measured = Math.abs(getVolt(rP) - getVolt(bP));
+            document.getElementById('pol-sc').innerText = measured + " V";
+
+            // Explanatory Message
+            let msg = document.getElementById('pol-msg');
+            if(rP === bP) { msg.innerText = "Probe နှစ်ခုတူနေသဖြင့် 0V သာပြပါမည်။"; return; }
+            
+            if(cond === 'normal') {
+                if((rP==='R'&&bP==='L') || (rP==='L'&&bP==='R')) msg.innerText = "L နှင့် N တိုင်းတာခြင်း = 230V ပြပါမည်။ (မှန်ကန်သည်)";
+                if((rP==='R'&&bP==='T') || (rP==='T'&&bP==='R')) msg.innerText = "L နှင့် E တိုင်းတာခြင်း = 230V ပြပါမည်။ (မှန်ကန်သည်)";
+                if((rP==='L'&&bP==='T') || (rP==='T'&&bP==='L')) msg.innerText = "N နှင့် E တိုင်းတာခြင်း = 0V ပြပါမည်။ (မှန်ကန်သည်)";
+            } else {
+                if((rP==='R'&&bP==='L') || (rP==='L'&&bP==='R')) msg.innerText = "L နှင့် N တိုင်းတာခြင်း = 230V။ (မီးလာနေသဖြင့် မှားနေမှန်း မသိနိုင်ပါ)";
+                if((rP==='R'&&bP==='T') || (rP==='T'&&bP==='R')) msg.innerText = "ညာဘက်အပေါက်(L) နှင့် E တိုင်းတာခြင်း = 0V သာပြနေပါသည်။ ❌ (Line နှင့် Neutral ပြောင်းပြန်ဖြစ်နေပါပြီ!)";
+                if((rP==='L'&&bP==='T') || (rP==='T'&&bP==='L')) msg.innerText = "ဘယ်ဘက်အပေါက်(N) နှင့် E တိုင်းတာခြင်း = 230V ပြနေပါသည်။ ❌ (Line သည် ဘယ်ဘက်သို့ ရောက်နေပါသည်!)";
+            }
+        }
+
+        // --- Other Functions ---
         let fanAng = 0; let anim;
         function runVFD() {
             let hz = document.getElementById('vfd-sl').value;
@@ -220,179 +386,59 @@
             cancelAnimationFrame(anim);
             if(hz > 0) fanAnim(hz);
         }
-        function fanAnim(hz) {
-            fanAng = (fanAng + hz*0.4) % 360;
-            document.getElementById('vfd-f').style.transform = `rotate(${fanAng}deg)`;
-            anim = requestAnimationFrame(() => fanAnim(hz));
-        }
+        function fanAnim(hz) { fanAng=(fanAng+hz*0.4)%360; document.getElementById('vfd-f').style.transform=`rotate(${fanAng}deg)`; anim=requestAnimationFrame(()=>fanAnim(hz)); }
         runVFD();
 
-        // 2. Trip
-        let tripped = false; let tTimer;
-        function runTrip() {
-            if(tripped) return;
-            let amp = parseInt(document.getElementById('trp-sl').value);
-            document.getElementById('trp-amp').innerText = amp + " A";
-            let area = document.getElementById('trp-area');
-            let msg = document.getElementById('trp-msg');
-            
-            if(amp > 50) {
-                area.style.background = "#e74c3c";
-                msg.innerText = "OVERLOAD WARNING!";
-                clearTimeout(tTimer);
-                tTimer = setTimeout(() => {
-                    tripped = true;
-                    area.style.background = "#000";
-                    msg.innerText = "TRIPPED! (POWER OFF)";
-                    document.getElementById('trp-sl').disabled = true;
-                    document.getElementById('trp-btn').style.display = "block";
-                }, 1000);
-            } else {
-                area.style.background = "#34495e";
-                msg.innerText = "NORMAL OPERATION";
-                clearTimeout(tTimer);
-            }
-        }
-        function resetTrip() {
-            tripped = false;
-            document.getElementById('trp-sl').value = 10;
-            document.getElementById('trp-sl').disabled = false;
-            document.getElementById('trp-btn').style.display = "none";
-            runTrip();
-        }
-
-        // 3. Power Factor
         function runPF() {
-            let kw = parseFloat(document.getElementById('pf-kw-sl').value);
-            let kvar = parseFloat(document.getElementById('pf-kvar-sl').value);
-            document.getElementById('pf-kw').innerText = kw + " kW";
-            document.getElementById('pf-kvar').innerText = kvar + " kVAR";
-            
-            let kva = Math.sqrt((kw*kw) + (kvar*kvar));
-            let pf = kw/kva;
-            document.getElementById('pf-kva').innerText = kva.toFixed(1);
-            document.getElementById('pf-res').innerText = pf.toFixed(2);
+            let kw = parseFloat(document.getElementById('pf-kw-sl').value); let kvar = parseFloat(document.getElementById('pf-kvar-sl').value);
+            document.getElementById('pf-kw').innerText = kw + " kW"; document.getElementById('pf-kvar').innerText = kvar + " kVAR";
+            let kva = Math.sqrt((kw*kw) + (kvar*kvar)); let pf = kw/kva;
+            document.getElementById('pf-kva').innerText = kva.toFixed(1); document.getElementById('pf-res').innerText = pf.toFixed(2);
             document.getElementById('pf-res').style.color = pf >= 0.9 ? "#2ecc71" : "#e74c3c";
         }
         runPF();
 
-        // 4. Star/Delta
-        function runStar() {
-            let val = document.getElementById('std-sel').value;
-            let msg = document.getElementById('std-msg');
-            if(val === 'star') { msg.innerText = "STAR (Y) CONNECTION"; msg.style.color = "#f1c40f"; }
-            else { msg.innerText = "DELTA (Δ) CONNECTION"; msg.style.color = "#e74c3c"; }
-        }
-
-        // 5. Lighting (NEW)
         function runLight() {
-            let area = parseFloat(document.getElementById('lt-a-sl').value);
-            let watts = parseFloat(document.getElementById('lt-w-sl').value);
-            document.getElementById('lt-area').innerText = area + " m²";
-            document.getElementById('lt-w').innerText = watts + " W";
-            
-            // Assume 100 lumens/watt, Maintenance factor 0.6
-            let totalLumens = watts * 100 * 0.6;
-            let lux = totalLumens / area;
-            
+            let area = parseFloat(document.getElementById('lt-a-sl').value); let watts = parseFloat(document.getElementById('lt-w-sl').value);
+            document.getElementById('lt-area').innerText = area + " m²"; document.getElementById('lt-w').innerText = watts + " W";
+            let lux = (watts * 100 * 0.6) / area;
             document.getElementById('lt-lux').innerText = lux.toFixed(0) + " Lux";
-            
-            // Visual feedback
+            let brightness = Math.min(lux / 300, 1);
             let room = document.getElementById('lt-room');
-            let brightness = Math.min(lux / 300, 1); // target 300 lux
-            room.style.backgroundColor = `rgba(241, 196, 15, ${brightness})`;
-            room.style.color = brightness > 0.5 ? "black" : "white";
-
+            room.style.backgroundColor = `rgba(241, 196, 15, ${brightness})`; room.style.color = brightness > 0.5 ? "black" : "white";
             let msg = document.getElementById('lt-msg');
-            if(lux >= 300) { msg.innerText = "✅ ရုံးခန်း/စာကြည့်ခန်းအတွက် အလင်းရောင် လုံလောက်ပါသည်။"; msg.style.color = "green"; }
-            else if(lux >= 150) { msg.innerText = "⚠️ အိပ်ခန်းအတွက်သာ လုံလောက်ပါသည်။ (ရုံးခန်းအတွက် မီးထပ်တိုးပါ)"; msg.style.color = "#d35400"; }
-            else { msg.innerText = "❌ အလင်းရောင် အလွန်နည်းပါသည်၊ မီးသီး ဝပ်အား တိုးပေးပါ။"; msg.style.color = "red"; }
+            if(lux >= 300) { msg.innerText = "✅ လုံလောက်ပါသည်။"; msg.style.color="green"; } else { msg.innerText = "❌ အလင်းရောင် မလုံလောက်ပါ။"; msg.style.color="red"; }
         }
         runLight();
 
-        // 6. Megger (NEW)
         function runMegger() {
-            let p1 = document.getElementById('mg-p1').value;
-            let p2 = document.getElementById('mg-p2').value;
+            let p1 = document.getElementById('mg-p1').value; let p2 = document.getElementById('mg-p2').value;
             let hasFault = document.getElementById('mg-fault').checked;
-            let screen = document.getElementById('mg-screen');
-            let msg = document.getElementById('mg-msg');
-
+            let screen = document.getElementById('mg-screen'); let msg = document.getElementById('mg-msg');
             screen.innerText = "TESTING...";
             setTimeout(() => {
-                if(p1 === p2) {
-                    screen.innerText = "0.00 MΩ";
-                    screen.style.color = "red";
-                    msg.innerText = "❌ ကြိုးတူနေသဖြင့် Short ဖြစ်နေပါသည်။";
-                    msg.style.color = "red";
-                } else if(hasFault && (p1 === 'L1' || p2 === 'L1') && (p1 === 'Earth' || p2 === 'Earth')) {
-                    screen.innerText = "0.15 MΩ";
-                    screen.style.color = "red";
-                    msg.innerText = "❌ DANGER: Phase L1 နှင့် Earth ကြား ရှော့ဖြစ် (ပေါက်) နေပါသည်။";
-                    msg.style.color = "red";
-                } else {
-                    screen.innerText = "> 999 MΩ";
-                    screen.style.color = "green";
-                    msg.innerText = "✅ Insulation ကောင်းမွန်ပါသည်။ ဘေးကင်းပါသည်။";
-                    msg.style.color = "green";
-                }
+                if(p1===p2) { screen.innerText="0.00 MΩ"; screen.style.color="red"; msg.innerText="❌ Short ဖြစ်နေပါသည်။"; msg.style.color="red"; }
+                else if(hasFault && (p1==='Earth'||p2==='Earth')) { screen.innerText="0.15 MΩ"; screen.style.color="red"; msg.innerText="❌ Phase L1 နှင့် Earth ရှော့ဖြစ်နေပါသည်။"; msg.style.color="red"; }
+                else { screen.innerText="> 999 MΩ"; screen.style.color="green"; msg.innerText="✅ Insulation ကောင်းမွန်ပါသည်။"; msg.style.color="green"; }
             }, 800);
         }
 
-        // 7. Earth Resistance (NEW)
-        function runEarth() {
-            let dist = parseFloat(document.getElementById('er-sl').value);
-            document.getElementById('er-dist').innerText = dist + " Meters";
-            
-            // Simulation logic: proper distance (around 20m) gives best reading (< 5 ohms)
-            let ohms = 100 / dist; 
-            
-            document.getElementById('er-screen').innerText = ohms.toFixed(2) + " Ω";
-            
-            // Move spikes visually
-            document.getElementById('er-p').style.left = (20 + dist) + "%";
-            document.getElementById('er-c').style.left = (20 + (dist*2)) + "%";
-
-            let msg = document.getElementById('er-msg');
-            if(ohms < 5) { msg.innerText = "✅ မြေကြီးခုခံမှု ၅ အုမ်းအောက်ဖြစ်၍ အလွန်ကောင်းမွန်ပါသည်။"; msg.style.color = "green"; }
-            else { msg.innerText = "❌ မြေကြီးခုခံမှု များနေပါသည်။ Spike များကို ပိုဝေးဝေးရွှေ့ပါ။"; msg.style.color = "red"; }
-        }
-        runEarth();
-
-        // 8. Continuity (NEW)
         let wireFixed = false;
         function fixWire() {
             wireFixed = !wireFixed;
-            let wire = document.getElementById('ct-wire');
-            let btn = document.getElementById('ct-fix-btn');
-            let msg = document.getElementById('ct-msg');
-            
-            if(wireFixed) {
-                wire.classList.add('wire-fixed');
-                btn.innerText = "ကြိုးကို ပြန်ဖြတ်မည်";
-                msg.innerText = "ကြိုးဆက်ထားပါသည်။ (Test ပြန်နှိပ်ကြည့်ပါ)";
-                msg.style.color = "blue";
-            } else {
-                wire.classList.remove('wire-fixed');
-                btn.innerText = "ကြိုးကို ပြန်ဆက်မည်";
-                msg.innerText = "ကြိုးပြတ်နေပါသည်။";
-                msg.style.color = "red";
-            }
+            document.getElementById('ct-wire').className = wireFixed ? 'wire-break wire-fixed' : 'wire-break';
+            document.getElementById('ct-fix-btn').innerText = wireFixed ? "ကြိုးကို ပြန်ဖြတ်မည်" : "ကြိုးကို ပြန်ဆက်မည်";
         }
         function runCont() {
-            let buzzer = document.getElementById('ct-buzzer');
-            let msg = document.getElementById('ct-msg');
-            if(wireFixed) {
-                buzzer.classList.add('beep');
-                msg.innerText = "✅ BEEP! ကြိုးကောင်းမွန်ပါသည် (Continuity ရှိသည်)။";
-                msg.style.color = "green";
-                setTimeout(() => buzzer.classList.remove('beep'), 1000);
-            } else {
-                msg.innerText = "❌ အသံမမြည်ပါ။ ကြိုးပြတ် (Open Circuit) ဖြစ်နေပါသည်။";
-                msg.style.color = "red";
-            }
+            let buzzer = document.getElementById('ct-buzzer'); let msg = document.getElementById('ct-msg');
+            if(wireFixed) { buzzer.classList.add('beep'); msg.innerText="✅ ကြိုးဆက်သွယ်မှု ကောင်းမွန်ပါသည်။"; msg.style.color="green"; setTimeout(()=>buzzer.classList.remove('beep'),1000); }
+            else { msg.innerText="❌ ကြိုးပြတ်နေပါသည်။"; msg.style.color="red"; }
         }
-
+        
+        // Initialize
+        resetMCB();
+        runStar();
+        runPolarity();
     </script>
 </body>
 </html>
